@@ -14,6 +14,9 @@ import modelo.Categoria;
 
 public class CategoriaDAOImp implements CategoriaDAO {
 
+    private static final String COL_ID = "ID_CATEGORIA";
+    private static final String COL_NOMBRE = "NOMBRE";
+    
     //1.Listar todas las categorías
     @Override
     public List<Categoria> listarCategorias() {
@@ -24,8 +27,8 @@ public class CategoriaDAOImp implements CategoriaDAO {
 
             while (rs.next()) {
                 Categoria cat = Categoria.builder()
-                        .id_categoria(rs.getInt("ID_CATEGORIA"))
-                        .nombre(rs.getString("NOMBRE"))
+                        .id_categoria(rs.getInt(COL_ID))
+                        .nombre(rs.getString(COL_NOMBRE))
                         .build();
                 lista.add(cat);
             }
@@ -49,8 +52,8 @@ public class CategoriaDAOImp implements CategoriaDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     cat = Categoria.builder()
-                            .id_categoria(rs.getInt("ID_CATEGORIA"))
-                            .nombre(rs.getString("NOMBRE"))
+                            .id_categoria(rs.getInt(COL_ID))
+                            .nombre(rs.getString(COL_NOMBRE))
                             .build();
                 }
             }

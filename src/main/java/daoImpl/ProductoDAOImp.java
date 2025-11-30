@@ -13,6 +13,12 @@ import modelo.Categoria;
 import modelo.Producto;
 
 public class ProductoDAOImp implements ProductoDAO {
+    private static final String COL_ID = "ID_CAT"; 
+    private static final String COL_CATE = "NOM_CAT";
+    private static final String COL_ID_PROD = "ID_PROD";
+    private static final String COL_DES_PROD = "DES_PROD";
+    private static final String COL_PRECIO = "PRECIO";
+
 
     //1. Lista todos los productos con el nombre categoria (JOIN)
     @Override
@@ -75,14 +81,14 @@ public class ProductoDAOImp implements ProductoDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Categoria categoria = Categoria.builder()
-                            .id_categoria(rs.getInt("ID_CAT"))
-                            .nombre(rs.getString("NOM_CAT"))
+                            .id_categoria(rs.getInt(COL_ID))
+                            .nombre(rs.getString(COL_CATE))
                             .build();
 
                     prod = Producto.builder()
-                            .id_producto(rs.getInt("ID_PROD"))
-                            .descripcion(rs.getString("DES_PROD"))
-                            .precio(rs.getBigDecimal("PRECIO"))
+                            .id_producto(rs.getInt(COL_ID_PROD))
+                            .descripcion(rs.getString(COL_DES_PROD))
+                            .precio(rs.getBigDecimal(COL_PRECIO))
                             .categoria(categoria)
                             .build();
 
@@ -119,14 +125,14 @@ public class ProductoDAOImp implements ProductoDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Categoria categoria = Categoria.builder()
-                            .id_categoria(rs.getInt("ID_CAT"))
-                            .nombre(rs.getString("CATEGORIA"))
+                            .id_categoria(rs.getInt(COL_ID))
+                            .nombre(rs.getString(COL_CATE))
                             .build();
 
                     Producto prod = Producto.builder()
-                            .id_producto(rs.getInt("ID_PROD"))
-                            .descripcion(rs.getString("PRODUCTO"))
-                            .precio(rs.getBigDecimal("PRECIO"))
+                            .id_producto(rs.getInt(COL_ID_PROD))
+                            .descripcion(rs.getString(COL_DES_PROD))
+                            .precio(rs.getBigDecimal(COL_PRECIO))
                             .categoria(categoria)
                             .build();
 
