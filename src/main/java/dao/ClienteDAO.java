@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.List;
 import modelo.Cliente;
 
 public interface ClienteDAO {
@@ -8,4 +9,5 @@ public interface ClienteDAO {
     public Cliente buscarClientePorId(int id);
     public boolean actualizarCliente(Cliente c);
     public boolean eliminarClientePorId(int id);
+    public List<Cliente> listarClientes();
 }

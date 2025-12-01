@@ -118,7 +118,8 @@ public class ProductoDAOImp implements ProductoDAO {
                      WHERE C.NOMBRE = ?
                      """;
 
-        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+        try (Connection cn = Conexion.getConnection(); 
+                PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, cat);
 

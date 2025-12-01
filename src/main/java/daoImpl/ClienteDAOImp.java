@@ -116,6 +116,7 @@ public class ClienteDAOImp implements ClienteDAO {
     }
 
     //listarClientes
+    @Override
     public List<Cliente> listarClientes() {
         ArrayList<Cliente> lista = new ArrayList<>();
         String sql = """
