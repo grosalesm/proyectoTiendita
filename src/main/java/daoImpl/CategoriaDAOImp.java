@@ -16,7 +16,7 @@ public class CategoriaDAOImp implements CategoriaDAO {
 
     private static final String COL_ID = "ID_CATEGORIA";
     private static final String COL_NOMBRE = "NOMBRE";
-    
+
     //1.Listar todas las categorías
     @Override
     public List<Categoria> listarCategorias() {
@@ -41,7 +41,31 @@ public class CategoriaDAOImp implements CategoriaDAO {
 
     //2.Buscar categoría por id
     @Override
-    public Categoria buscarCategoriaPorId(int id) {
+    public Categoria buscarCategoriaPorNombre(String nombre) {
+        Categoria cat = null;
+        String sql = "SELECT ID_CATEGORIA, NOMBRE FROM CATEGORIA WHERE ID_CATEGORIA = ?";
+
+        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+
+            ps.setString(1, nombre);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    cat = Categoria.builder()
+                            .id_categoria(rs.getInt(COL_ID))
+                            .nombre(rs.getString(COL_NOMBRE))
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscarCategoriaPorNombre: " + e.getMessage());
+        }
+
+        return cat;
+    }
+
+    @Override
+    public Categoria buscarCategoriaPorID(int id) {
         Categoria cat = null;
         String sql = "SELECT ID_CATEGORIA, NOMBRE FROM CATEGORIA WHERE ID_CATEGORIA = ?";
 
@@ -58,7 +82,7 @@ public class CategoriaDAOImp implements CategoriaDAO {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error al buscarCategoriaPorId: " + e.getMessage());
+            System.out.println("Error al buscarCategoriaPorNombre: " + e.getMessage());
         }
 
         return cat;
@@ -69,8 +93,7 @@ public class CategoriaDAOImp implements CategoriaDAO {
     public Categoria agregarCategoria(Categoria c) {
         String sql = "INSERT INTO CATEGORIA (NOMBRE) VALUES (?)";
 
-        try (Connection cn = Conexion.getConnection(); 
-                PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, c.getNombre());
             ps.executeUpdate();

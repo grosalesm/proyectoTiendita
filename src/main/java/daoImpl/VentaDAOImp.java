@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import modelo.Venta;
-import modelo.dto.VentaListadoDTO;
+import modelo.modeloDTO.VentaListadoDTO;
 
 public class VentaDAOImp implements VentaDAO {
 
@@ -19,28 +19,28 @@ public class VentaDAOImp implements VentaDAO {
     public int registrarVenta(Venta v) {
         int nuevoId = 0;
         String sql = """
-                     INSERT INTO VENTA(ID_CLIENTE, ID_PRODUCTO, CANTIDAD, FECHA)
-                     VALUES(?, ?, ?, ?)
-                     """;
+                 INSERT INTO VENTA(ID_CLIENTE, ID_PRODUCTO, CANTIDAD, FECHA)
+                 VALUES(?, ?, ?, ?)
+                 """;
 
-        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql,
-                Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, v.getCliente().getId_cliente());
             ps.setInt(2, v.getProducto().getId_producto());
             ps.setInt(3, v.getCantidad());
-            ps.setDate(4, java.sql.Date.valueOf(LocalDate.now()));
+            ps.setDate(4, java.sql.Date.valueOf(v.getFecha()));
 
             int fila = ps.executeUpdate();
 
             if (fila == 1) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
-                        nuevoId = rs.getInt(v.getId_venta());
+                        nuevoId = rs.getInt(1);
                         v.setId_venta(nuevoId);
                     }
                 }
             }
+
         } catch (SQLException e) {
             System.out.println("Error al registrarVenta: " + e.getMessage());
         }
@@ -176,23 +176,64 @@ public class VentaDAOImp implements VentaDAO {
         }
         return lista;
     }
-    
+
     @Override
-    public boolean eliminarVenta(int idVen){
+    public boolean eliminarVenta(int idVen) {
         String sql = "DELETE FROM VENTA WHERE ID_VENTA = ?";
-        
-        try (Connection cn = Conexion.getConnection();
-                PreparedStatement ps = cn.prepareStatement(sql)){
+
+        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
             ps.setInt(1, idVen);
-            
+
             int filas = ps.executeUpdate();
-            
+
             return filas > 0;
-            
+
         } catch (SQLException e) {
             System.out.println("Error al eliminarVenta: " + e.getMessage());
         }
-        
+
         return false;
+    }
+
+    @Override
+    public VentaListadoDTO buscarVentaPorId(int id) {
+        String sql = """
+                SELECT
+                V.ID_VENTA,
+                C.ID_CLIENTE,
+                C.NOMBRES,
+                P.DESCRIPCION,
+                V.CANTIDAD,
+                P.PRECIO,
+                (P.PRECIO * V.CANTIDAD) AS TOTAL,
+                V.FECHA
+                FROM VENTA V
+                INNER JOIN CLIENTE C ON V.ID_CLIENTE = C.ID_CLIENTE
+                INNER JOIN PRODUCTO P ON V.ID_PRODUCTO = P.ID_PRODUCTO
+                WHERE V.ID_VENTA = ?
+                """;
+
+        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return VentaListadoDTO.builder()
+                            .idVenta(rs.getInt("ID_VENTA"))
+                            .idCliente(rs.getInt("ID_CLIENTE"))
+                            .cliente(rs.getString("NOMBRES"))
+                            .producto(rs.getString("DESCRIPCION"))
+                            .cantidad(rs.getInt("CANTIDAD"))
+                            .precioUnit(rs.getBigDecimal("PRECIO"))
+                            .total(rs.getBigDecimal("TOTAL"))
+                            .fecha(rs.getDate("FECHA").toLocalDate())
+                            .build();
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscarVentaPorId: " + e.getMessage());
+        }
+        return null;
     }
 }

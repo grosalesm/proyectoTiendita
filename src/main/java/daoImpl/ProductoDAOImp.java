@@ -13,12 +13,12 @@ import modelo.Categoria;
 import modelo.Producto;
 
 public class ProductoDAOImp implements ProductoDAO {
-    private static final String COL_ID = "ID_CAT"; 
+
+    private static final String COL_ID = "ID_CAT";
     private static final String COL_CATE = "NOM_CAT";
     private static final String COL_ID_PROD = "ID_PROD";
     private static final String COL_DES_PROD = "DES_PROD";
     private static final String COL_PRECIO = "PRECIO";
-
 
     //1. Lista todos los productos con el nombre categoria (JOIN)
     @Override
@@ -29,7 +29,6 @@ public class ProductoDAOImp implements ProductoDAO {
                     P.ID_PRODUCTO AS ID_PROD, 
                     P.DESCRIPCION AS DES_PROD,
                     P.PRECIO,
-                    C.ID_CATEGORIA AS ID_CAT,
                     C.NOMBRE AS NOM_CAT,
                     P.STOCK
                 FROM PRODUCTO AS P INNER JOIN CATEGORIA AS C
@@ -39,7 +38,6 @@ public class ProductoDAOImp implements ProductoDAO {
 
             while (rs.next()) {
                 Categoria categoria = Categoria.builder()
-                        .id_categoria(rs.getInt("ID_CAT"))
                         .nombre(rs.getString("NOM_CAT"))
                         .build();
 
@@ -65,7 +63,8 @@ public class ProductoDAOImp implements ProductoDAO {
     public Producto buscarProductoPorId(int id) {
         Producto prod = null;
         String sql = """
-                SELECT P.ID_PRODUCTO AS ID_PROD, 
+                SELECT
+                P.ID_PRODUCTO AS ID_PROD, 
                 P.DESCRIPCION AS DES_PROD,
                 P.PRECIO,
                 C.ID_CATEGORIA AS ID_CAT,
@@ -106,34 +105,34 @@ public class ProductoDAOImp implements ProductoDAO {
     public List<Producto> listarProductoPorCategoria(String cat) {
         List<Producto> lista = new ArrayList<>();
         String sql = """
-                     SELECT
-                     P.ID_PRODUCTO AS ID_PROD,
-                     P.DESCRIPCION AS PRODUCTO,
-                     P.PRECIO,
-                     C.ID_CATEGORIA AS ID_CAT,
-                     C.NOMBRE AS CATEGORIA
-                     FROM PRODUCTO AS P
-                     INNER JOIN CATEGORIA AS C
-                     ON P.ID_CATEGORIA = C.ID_CATEGORIA
-                     WHERE C.NOMBRE = ?
-                     """;
+                 SELECT
+                 P.ID_PRODUCTO AS ID_PROD,
+                 P.DESCRIPCION AS DES_PROD,
+                 P.PRECIO AS PRECIO,
+                 C.ID_CATEGORIA AS ID_CAT,
+                 C.NOMBRE AS NOM_CAT
+                 FROM PRODUCTO AS P
+                 INNER JOIN CATEGORIA AS C
+                 ON P.ID_CATEGORIA = C.ID_CATEGORIA
+                 WHERE C.NOMBRE = ?
+                 """;
 
-        try (Connection cn = Conexion.getConnection(); 
-                PreparedStatement ps = cn.prepareStatement(sql)) {
+        try (Connection cn = Conexion.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
 
             ps.setString(1, cat);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+
                     Categoria categoria = Categoria.builder()
-                            .id_categoria(rs.getInt(COL_ID))
-                            .nombre(rs.getString(COL_CATE))
+                            .id_categoria(rs.getInt(COL_ID)) // ID_CAT
+                            .nombre(rs.getString(COL_CATE)) // NOM_CAT
                             .build();
 
                     Producto prod = Producto.builder()
-                            .id_producto(rs.getInt(COL_ID_PROD))
-                            .descripcion(rs.getString(COL_DES_PROD))
-                            .precio(rs.getBigDecimal(COL_PRECIO))
+                            .id_producto(rs.getInt(COL_ID_PROD)) // ID_PROD
+                            .descripcion(rs.getString(COL_DES_PROD))// DES_PROD
+                            .precio(rs.getBigDecimal(COL_PRECIO)) // PRECIO
                             .categoria(categoria)
                             .build();
 

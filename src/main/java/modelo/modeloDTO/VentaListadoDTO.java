@@ -1,4 +1,4 @@
-package modelo.dto;
+package modelo.modeloDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
